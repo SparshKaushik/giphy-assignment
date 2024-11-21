@@ -20,3 +20,13 @@ export const useHomePageGifState = create<HomePageGifStateType>((set) => ({
           : HomePageGifState.Play,
     })),
 }));
+
+type isAPILimitExhaustedType = {
+  state: boolean;
+  setIsAPILimitExhausted: (isExhausted: boolean) => void;
+};
+
+export const isAPILimitExhausted = create<isAPILimitExhaustedType>((set) => ({
+  state: false,
+  setIsAPILimitExhausted: (isExhausted: boolean) => set({ state: isExhausted }),
+}));

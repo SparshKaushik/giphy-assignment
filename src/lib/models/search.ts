@@ -1,4 +1,8 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import {
+  useInfiniteQuery,
+  useQuery,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 
 import api from "../axios";
 import { GIFObject } from "../types/GIF";
@@ -15,38 +19,48 @@ type SearchParams = {
   bundle?: string;
 };
 
-type SearchResponse = PaginatedResponse<GIFObject>;
+type SearchResponse = PaginatedResponse<GIFObject[]>;
 
 export const useSearchQuery = ({
   params,
   options,
 }: {
   params: SearchParams;
-  options?: UseQueryOptions<SearchResponse>;
+  options?: {
+    enabled: boolean;
+  };
 }) =>
-  useQuery({
-    queryKey: ["search"],
-    queryFn: async () => {
+  useInfiniteQuery({
+    queryKey: ["search", params],
+    queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
       const response = await api.get("gifs/search", {
-        params,
+        params: {
+          ...params,
+          offset: pageParam,
+          limit: 20,
+        },
       });
       return response.data as SearchResponse;
     },
-    ...options,
+    getNextPageParam: (lastPage, pages, lastPageParam) => {
+      const nextOffset = lastPageParam + (params?.limit ?? 20);
+      return nextOffset < 4999 ? nextOffset : undefined;
+    },
+    initialPageParam: 0,
   });
 
 type SearchSuggestionsParams = {
   term: string;
 };
 
-type SearchSuggestionsResponse = APIResponse<SearchSuggestion>;
+type SearchSuggestionsResponse = APIResponse<SearchSuggestion[]>;
 
 export const useSearchSuggestionsQuery = ({
   params,
   options,
 }: {
   params: SearchSuggestionsParams;
-  options?: UseQueryOptions<SearchSuggestionsResponse>;
+  options?: Omit<UseQueryOptions<SearchSuggestionsResponse>, "queryKey">;
 }) =>
   useQuery({
     queryKey: ["searchSuggestions"],

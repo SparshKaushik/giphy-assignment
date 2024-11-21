@@ -1,9 +1,5 @@
 import {
-  InfiniteData,
   useInfiniteQuery,
-  UseInfiniteQueryOptions,
-  useQuery,
-  UseQueryOptions,
 } from "@tanstack/react-query";
 
 import api from "../axios";
@@ -37,7 +33,7 @@ export const useTrendingGIFsQuery = ({
       });
       return response.data as TrendingGIFsResponse;
     },
-    getNextPageParam: (lastPage, pages, lastPageParam, allPageParams) => {
+    getNextPageParam: (lastPage, pages, lastPageParam) => {
       const nextOffset = lastPageParam + (params?.limit ?? 20);
       return nextOffset < 499 ? nextOffset : undefined;
     },

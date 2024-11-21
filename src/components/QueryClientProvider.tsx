@@ -1,7 +1,6 @@
 import {
   QueryClient,
   QueryClientProvider as QCP,
-  keepPreviousData,
 } from "@tanstack/react-query";
 import { type ReactNode } from "react";
 
@@ -14,7 +13,6 @@ export default function QueryClientProvider({
     defaultOptions: {
       queries: {
         retry: 0,
-        placeholderData: keepPreviousData,
       },
     },
   });
