@@ -17,6 +17,7 @@ export default function Index() {
         onEndReached={() => {
           gifs.fetchNextPage();
         }}
+        endLoading={gifs.isFetchingNextPage}
       />
     </View>
   );

@@ -1,9 +1,9 @@
-import { StyleSheet, Dimensions, ActivityIndicator } from "react-native";
+import { StyleSheet, ActivityIndicator } from "react-native";
 import { Image } from "expo-image";
+import { MasonryFlashList } from "@shopify/flash-list";
 
 import { GIFObject } from "@/lib/types/GIF";
-import { ResponsiveGrid } from "./ResponsiveGrid";
-import { MasonryFlashList } from "@shopify/flash-list";
+import { HomePageGifState, useHomePageGifState } from "@/lib/states";
 import { View } from "./ui/Themed";
 
 type GIFListViewProps = {
@@ -17,27 +17,37 @@ export function GIFListView({
   onEndReached,
   endLoading,
 }: GIFListViewProps) {
-  const renderItem = ({ item: gif }: { item: GIFObject }) => (
-    <Image
-      source={gif.images.fixed_width.url}
-      style={[
-        styles.image,
-        {
-          height: Number(gif.images.fixed_width.height),
-          width: Number(gif.images.fixed_width.width),
-        },
-      ]}
-      placeholder={{
-        blurhash: "L6S$ovof~q-;IUWBt7j[-;t79FM{",
-      }}
-    />
-  );
+  const RenderItem = ({ item: gif }: { item: GIFObject }) => {
+    const state = useHomePageGifState((s) => s.state);
+
+    return (
+      <Image
+        source={
+          gif.images[
+            state === HomePageGifState.Play
+              ? "fixed_width"
+              : "fixed_width_still"
+          ].url
+        }
+        style={[
+          styles.image,
+          {
+            height: Number(gif.images.fixed_width.height),
+            width: Number(gif.images.fixed_width.width),
+          },
+        ]}
+        placeholder={{
+          blurhash: "L6S$ovof~q-;IUWBt7j[-;t79FM{",
+        }}
+      />
+    );
+  };
 
   return (
     <MasonryFlashList
       data={data}
       numColumns={2}
-      renderItem={renderItem}
+      renderItem={({ item }) => <RenderItem item={item} />}
       onEndReached={onEndReached}
       onEndReachedThreshold={1}
       estimatedItemSize={499}
@@ -53,9 +63,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
 
     padding: "2%",
-  },
-  column: {
-    gap: 8,
   },
   image: {
     borderRadius: 8,

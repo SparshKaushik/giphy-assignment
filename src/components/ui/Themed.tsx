@@ -1,4 +1,5 @@
 import { Text as DefaultText, View as DefaultView } from "react-native";
+
 import useThemeColor, { ThemeProps } from "./useThemeColor";
 
 export type TextProps = ThemeProps & DefaultText["props"];
