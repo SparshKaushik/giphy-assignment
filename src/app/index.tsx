@@ -1,32 +1,29 @@
-import Colors from "@/constants/Colors";
-import { useTrendingGIFsQuery } from "@/lib/models/trending";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { StyleSheet } from "react-native";
+
+import { useTrendingGIFsQuery } from "@/lib/models/trending";
+import { GIFListView } from "@/components/GIFListView";
+import { View } from "@/components/ui/Themed";
 
 export default function Index() {
-  const gifs = useTrendingGIFsQuery({
-    params: {
-      limit: 10,
-    },
-  });
+  const gifs = useTrendingGIFsQuery({});
 
   useEffect(() => {}, [gifs]);
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Text
-        style={{
-          color: Colors.dark.text,
+    <View style={styles.container}>
+      <GIFListView
+        data={gifs.data?.pages.flatMap((page) => page.data) ?? []}
+        onEndReached={() => {
+          gifs.fetchNextPage();
         }}
-      >
-        Edit app/index.tsx to edit this screen.
-      </Text>
+      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+});

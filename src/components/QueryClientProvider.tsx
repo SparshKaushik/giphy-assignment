@@ -1,5 +1,3 @@
-"use client";
-
 import {
   QueryClient,
   QueryClientProvider as QCP,
@@ -17,7 +15,6 @@ export default function QueryClientProvider({
       queries: {
         retry: 0,
         placeholderData: keepPreviousData,
-        refetchOnMount: "always",
       },
     },
   });

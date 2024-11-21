@@ -1,7 +1,14 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  UseInfiniteQueryOptions,
+  useQuery,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 
 import api from "../axios";
 import { GIFObject } from "../types/GIF";
+import { PaginatedResponse } from "../types/APIResponse";
 
 type TrendingGIFsParams = {
   limit?: number;
@@ -11,20 +18,28 @@ type TrendingGIFsParams = {
   bundle?: string;
 };
 
+export type TrendingGIFsResponse = PaginatedResponse<GIFObject[]>;
+
 export const useTrendingGIFsQuery = ({
   params,
-  options,
 }: {
-  params: TrendingGIFsParams;
-  options?: UseQueryOptions<GIFObject[]>;
+  params?: Omit<TrendingGIFsParams, "offset">;
 }) =>
-  useQuery({
+  useInfiniteQuery({
     queryKey: ["trendingGifs"],
-    queryFn: async () => {
+    queryFn: async ({ pageParam = 0 }: { pageParam: number }) => {
       const response = await api.get("gifs/trending", {
-        params,
+        params: {
+          ...params,
+          offset: pageParam,
+          limit: params?.limit ?? 20,
+        },
       });
-      return response.data as GIFObject[];
+      return response.data as TrendingGIFsResponse;
     },
-    ...options,
+    getNextPageParam: (lastPage, pages, lastPageParam, allPageParams) => {
+      const nextOffset = lastPageParam + (params?.limit ?? 20);
+      return nextOffset < 499 ? nextOffset : undefined;
+    },
+    initialPageParam: 0,
   });
